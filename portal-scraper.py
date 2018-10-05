@@ -13,8 +13,8 @@ login_page = "https://portal.aut.ac.ir/aportal/"
 login_captcha = 'https://portal.aut.ac.ir/aportal/PassImageServlet'
 right_menu = 'https://portal.aut.ac.ir/aportal/regadm/style/menu/menu.student.jsp'
 
-username = str(9631055)
-password = str('0021922683')
+username = str('')
+password = str('')
 drop_wait = 1
 
 
