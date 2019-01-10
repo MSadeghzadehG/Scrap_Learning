@@ -10,46 +10,34 @@ from time import sleep
 
 main_url = 'https://portal.aut.ac.ir'
 login_page = "https://portal.aut.ac.ir/aportal/"
-login_captcha = 'https://portal.aut.ac.ir/aportal/PassImageServlet'
+login_captcha_url = 'https://portal.aut.ac.ir/aportal/PassImageServlet'
 right_menu = 'https://portal.aut.ac.ir/aportal/regadm/style/menu/menu.student.jsp'
+menu_request = '/aportal/regadm/student.portal/student.portal.jsp?action=edit&st_info=register&st_sub_info='
+main_menu_url = main_url + menu_request+'u_mine_all'
 
+
+# set the portal username and password for logging in 
 username = str('')
 password = str('')
 drop_wait = 1
 
 
 menu_urls = []
-# menu_urls.append(
-#     main_url + '/aportal/regadm/student.portal/student.portal.jsp?action=edit&st_info=register&st_sub_info=u_mine_all')
-# menu_urls.append(
-#     main_url + '/aportal/regadm/student.portal/student.portal.jsp?action=edit&st_info=register&st_sub_info=u_pre_register')
-# menu_urls.append(
-    # main_url + '/aportal/regadm/student.portal/student.portal.jsp?action=edit&st_info=register&st_sub_info=u_math')
-# menu_urls.append(
-#     main_url + '/aportal/regadm/student.portal/student.portal.jsp?action=edit&st_info=register&st_sub_info=u_physlab2')
-# menu_urls.append(
-#     main_url + '/aportal/regadm/student.portal/student.portal.jsp?action=edit&st_info=register&st_sub_info=u_phys')
-# menu_urls.append(
-#     main_url + '/aportal/regadm/student.portal/student.portal.jsp?action=edit&st_info=register&st_sub_info=u_physlab1')
-# menu_urls.append(
-#     main_url + '/aportal/regadm/student.portal/student.portal.jsp?action=edit&st_info=register&st_sub_info=u_serv')
-#menu_urls.append(
-#    main_url + '/aportal/regadm/student.portal/student.portal.jsp?action=edit&st_info=register&st_sub_info=u_english')
-# menu_urls.append(
-#     main_url + '/aportal/regadm/student.portal/student.portal.jsp?action=edit&st_info=register&st_sub_info=u_history')
-# menu_urls.append(
-#     main_url + '/aportal/regadm/student.portal/student.portal.jsp?action=edit&st_info=register&st_sub_info=u_andishe')
-# menu_urls.append(
-#     main_url + '/aportal/regadm/student.portal/student.portal.jsp?action=edit&st_info=register&st_sub_info=u_persian')
-# menu_urls.append(
-#     main_url + '/aportal/regadm/student.portal/student.portal.jsp?action=edit&st_info=register&st_sub_info=u_akhlagh')
-menu_urls.append(main_url + '/aportal/regadm/student.portal/student.portal.jsp?action=edit&st_info=register&st_sub_info=u_revel')
-#menu_urls.append(
-#     main_url + '/aportal/regadm/student.portal/student.portal.jsp?action=edit&st_info=register&st_sub_info=u_tafsir')
-# menu_urls.append(
-#     main_url + '/aportal/regadm/student.portal/student.portal.jsp?action=edit&st_info=register&st_sub_info=u_phyedu1')
-# menu_urls.append(
-#     main_url + '/aportal/regadm/student.portal/student.portal.jsp?action=edit&st_info=register&st_sub_info=u_phyedu2')
+menu_urls.append(main_url + menu_request+'u_pre_register')
+menu_urls.append(main_url + menu_request+'u_math')
+menu_urls.append(main_url + menu_request+'u_physlab2')
+menu_urls.append(main_url + menu_request+'u_phys')
+menu_urls.append(main_url + menu_request+'u_physlab1')
+menu_urls.append(main_url + menu_request+'u_serv')
+menu_urls.append(main_url + menu_request+'u_english')
+menu_urls.append(main_url + menu_request+'u_history')
+menu_urls.append(main_url + menu_request+'u_andishe')
+menu_urls.append(main_url + menu_request+'u_persian')
+menu_urls.append(main_url + menu_request+'u_akhlagh')
+menu_urls.append(main_url + menu_request+'u_revel')
+menu_urls.append(main_url + menu_request+'u_tafsir')
+menu_urls.append(main_url + menu_request+'u_phyedu1')
+menu_urls.append(main_url + menu_request+'u_phyedu2')
 
 
 def plans_output(all_courses, plans):
@@ -65,6 +53,14 @@ def plans_output(all_courses, plans):
             f.write('<hr>')
 
 
+def find_elements_by_xpath(text, xpath):
+    tree = html.fromstring(text)
+    list = []
+    for link in tree.xpath(xpath):
+        list.append(link)
+    return list
+
+
 def courses_output(cookies, menu_urls):
     all_courses = []
     for tab in menu_urls:
@@ -76,14 +72,7 @@ def courses_output(cookies, menu_urls):
     return all_courses
 
 
-def find_elements_by_xpath(text, xpath):
-    tree = html.fromstring(text)
-    list = []
-    for link in tree.xpath(xpath):
-        list.append(link)
-    return list
-
-
+# bainrizes the login page captcha image 
 def filter_captcha(img):
     img = img[5:35, 5:145]
     n_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -123,6 +112,7 @@ def filter_captcha(img):
     return img
 
 
+# bainrizes the getting course captcha image
 def get_course_filter_captcha(img):
     img = img[5:35,2:58]
     n_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -162,8 +152,9 @@ def get_course_filter_captcha(img):
     return img
 
 
+# gets the captcha image
 def get_captcha(cookies):
-    request = requests.get(login_captcha, headers={'Cookie': cookies}, stream=True)
+    request = requests.get(login_captcha_url, headers={'Cookie': cookies}, stream=True)
     nparr = bytearray(b'')
     for chunk in request.iter_content(chunk_size=128):
         nparr.extend(chunk)
@@ -173,11 +164,11 @@ def get_captcha(cookies):
     return img
 
 
-def get_course_captcha(model, cookies):
-    num = 5
+# bypasses captcha image
+def bypass_captcha(model, cookies,num_of_letters,num_of_check):
     captchas = []
     # print ('omad')
-    for i in range(0, num):
+    for i in range(0, num_of_check):
         # sleep(1)
         captcha = ''
         img = get_captcha(cookies)
@@ -189,7 +180,7 @@ def get_course_captcha(model, cookies):
         # cv2.waitKey(0)
         # cv2.destroyAllWindows()
         letters = []
-        for j in range(0, 2):
+        for j in range(0, num_of_letters):
             img1 = np.zeros((30, 27, 1))
             img1[:, :, 0] = img[:, j * 28 + 1: (j + 1) * 28]
             letters.append(img1)
@@ -201,9 +192,9 @@ def get_course_captcha(model, cookies):
             #     print(predict)
         captchas.append(captcha)
     letters = []
-    for j in range(0, 2):
+    for j in range(0, num_of_letters):
         letter = []
-        for i in range(0, num):
+        for i in range(0, num_of_check):
             letter.append(captchas[i][j])
         letters.append(max(set(letter), key=letter.count))
     captcha = ''.join(letters)
@@ -212,41 +203,14 @@ def get_course_captcha(model, cookies):
     return captcha
 
 
+# login to portal
 def login(model):
-    num = 15
     request = requests.get(login_page)
     # print(request.headers)
     cookies = 'JSESSIONID=' + str(
         request.headers['Set-Cookie'].split(';')[0].split('=')[1]) + ';_ga=GA1.3.787589358.1533647200'
     try:
-        captchas = []
-        for i in range(0, num):
-            captcha = ''
-            img = get_captcha(cookies)
-            img = filter_captcha(img)
-            # cv2.imshow('img', img)
-            # cv2.waitKey(0)
-            # cv2.destroyAllWindows()
-            letters = []
-            for j in range(0, 5):
-                img1 = np.zeros((30, 27, 1))
-                img1[:, :, 0] = img[:, j * 28 + 1: (j + 1) * 28]
-                letters.append(img1)
-            prediction = list(model.predict(np.array(letters)))
-            for predict in prediction:
-                # if float(1) in list(predict):
-                captcha += (chr(list(predict).index(max(list(predict)))+97))
-                # else:
-                #     print(predict)
-            captchas.append(captcha)
-        letters = []
-        for j in range(0, 5):
-            letter = []
-            for i in range(0, num):
-                letter.append(captchas[i][j])
-            letters.append(max(set(letter), key=letter.count))
-        captcha = ''.join(letters)
-        print(captcha)
+        captcha = bypass_captcha(model,cookies,5,15)
     except:
         captcha = 'aaaaa'
     # print('write the captcha:')
@@ -264,6 +228,7 @@ def login(model):
         return True, 'done', cookies
 
 
+# controls dropping
 def login_control(model):
     while True:
         returns = login(model)
@@ -273,9 +238,10 @@ def login_control(model):
         sleep(drop_wait)
 
 
+# gets the selected course
 def get_course(input_value, cookies, model):
     # input_value = '1051112_1__'
-    get_course = 'https://portal.aut.ac.ir/aportal/regadm/student.portal/student.portal.jsp?action=apply_reg&st_info=add&st_reg_course='+input_value+'&addpassline='+get_course_captcha(model, cookies)+'&st_course_add=%D8%AF%D8%B1%D8%B3+%D8%B1%D8%A7+%D8%A7%D8%B6%D8%A7%D9%81%D9%87+%DA%A9%D9%86'
+    get_course = 'https://portal.aut.ac.ir/aportal/regadm/student.portal/student.portal.jsp?action=apply_reg&st_info=add&st_reg_course='+input_value+'&addpassline='+bypass_captcha(model, cookies,2,5)+'&st_course_add=%D8%AF%D8%B1%D8%B3+%D8%B1%D8%A7+%D8%A7%D8%B6%D8%A7%D9%81%D9%87+%DA%A9%D9%86'
     # print(get_course)
     request = requests.post(get_course, headers={'Cookie': cookies})
     while '(3)' in request.text:
@@ -303,52 +269,29 @@ def main():
     print("Loaded model from disk")
 
     plan1 = []
-    darsha = ['rev']
-    # plan1, darsha = [], ['mm', 'me', 'ae', 'am', 'ds', 'af', 'r2', 't2', 'z2']
     # p1
-    # plan1.append(('3102013_2__', 'mm')) #mm sedighi
-    #
+    plan1.append(('3102013_2__', 'mm')) #mm sedighi
     # plan1.append(('3102043_2__', 'me')) #me
-    #
     # plan1.append(('3102051_3__', 'ae')) #ae
-    #
     # plan1.append(('3102021_6__', 'am')) #am
-    #
-    # plan1.append(('3102033_2_3102030_1', 'ds'))  # ds
     # plan1.append(('3102033_2_3102030_2', 'ds'))  # ds
-    #
     # plan1.append(('1040111_7__', 't2')) # t2
-    #
-    # plan1.append(('1022391_12__', 'af'))  # afr2
-    # plan1.append(('1022391_11__', 'af'))  # afs1
-    # plan1.append(('1022391_42__', 'af'))  # afr1
-    # plan1.append(('1022391_41__', 'af'))  # afs2
+    # plan1.append(('1061032_4__', 'z2')) #z2
+    # plan1.append(('1011103_3_1011100_6', 'r2')) #r2
 
-    plan1.append(('1051412_15__', 'rev')) #z2
-#    plan1.append(('1061032_4__', 'z2')) #z2
-
-    # plan1.append(('1011103_3_1011100_4', 'r2')) #r2
-#    plan1.append(('1011103_3_1011100_5', 'r2')) #r2
- #   plan1.append(('1011103_3_1011100_6', 'r2')) #r2
-    #
+    plan2 = []
     # p2
     # plan2.append('3102013_1__') #mm
     # plan2.append('3102043_2__') #me
     # plan2.append('3102051_3__') #ae
     # plan2.append('3102021_6__') #am
-    # plan2.append('3102033_2_3102030_1') #ds
     # plan2.append('3102033_2_3102030_2') #ds
     # plan2.append('1022391_1__') #afg
-    # plan2.append('1022391_2__') #afs
-    # # plan2.append('1011103_2_1011100_1') # r2 :/
     # plan2.append('1011103_4_1011100_6') #r2
     # plan2.append('1040111_7__') #t2
     # plan2.append('1051412_11__') #em1
-    # plan2.append('1051412_12__')#em2
-    # plan2.append('1051112_2__') #nd
     # plan2.append('1051112_1__') #nk
     
-
 
     # request = requests.get(login_page)
     # # print(request.headers)
@@ -364,29 +307,12 @@ def main():
     # all_courses = courses_output(cookies)
     # plans_output(all_courses,plans)
 
-    # done = []
-    # while True:
-    #     for dars in darsha:
-    #         for course in plan1:
-    #             if course[1] == dars and dars not in done:
-    #                 sleep(drop_wait)
-    #                 if get_course(course[0], cookies, model):
-    #                     done.append(dars)
-    #                     break
-    #         if dars in done:
-    #             print(dars + ' done')
-    #         else:
-    #             print(dars + ' failed')
-    #         if len(done) == len(darsha):
-    #             return
-
     while True:
-        for tab in menu_urls:
-            sleep(drop_wait)
-            request = requests.get(tab, headers={'Cookie': cookies})
-            for course in plan1:
-                if course[0] in request.text:
-                    get_course(course[0], cookies, model)
+        sleep(drop_wait)
+        request = requests.get(main_menu_url, headers={'Cookie': cookies})
+        for course in plan1:
+            if course[0] in request.text:
+                get_course(course[0], cookies, model)
 
     # print(request.content)
     # < input class ="stdcheckbox" type="checkbox" id="st_reg_course" name="st_reg_course" value="{CousreId}_{GroupNo}_{AssistCourseId}_{AssistGroupNo}" >

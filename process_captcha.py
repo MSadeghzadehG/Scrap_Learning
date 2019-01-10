@@ -4,8 +4,10 @@ import os
 import shutil
 from matplotlib import pyplot as plt
 
-pics_src = '/home/mahdi/Desktop/pics/'
-parted_src = '/home/mahdi/Desktop/parted/'
+path = os.path.dirname(os.path.realpath(__file__))
+# print(os.path.join(path, 'pics'))
+pics_src = os.path.join(path, 'pics')
+parted_src = os.path.join(path, 'parted')
 if os.path.isdir(parted_src):
     shutil.rmtree(parted_src)
 os.makedirs(parted_src)
@@ -49,19 +51,10 @@ for img_src in pics:
         if histr.max() < min_hist:
             min_hist = histr.max()
             selected_color_min = col
-        # if name == 'RLXEP':
-        #     print(str(col) + ' ' + str(max_hist) + ' ' + name)
-        #     plt.plot(histr, color=col)
-        #     plt.xlim([0, 256])
-        #     plt.show()
     if max_hist < 1000:
         selected_color = selected_color_min
     else:
         selected_color = selected_color_max
-
-    # if name == 'RLXEP':
-    #     # cv2.imwrite('bw_image.png', img)
-    #     selected_color = 'n'
 
     if selected_color == 'r':
         img[:, :, 1] = 0
@@ -85,23 +78,6 @@ for img_src in pics:
         img = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
     else:
         img = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
-
-    # find the contours (continuous blobs of pixels) the image
-    # contours = cv2.findContours(img.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)[1]
-    #
-    # letter_image_regions = []
-    # 	# Sort the detected letter images based on the x coordinate to make sure
-    # 	# we are processing them from left-to-right so we match the right image
-    # 	# with the right letter
-    # letter_image_regions = sorted(letter_image_regions, key=lambda x: x[0])
-    # image, contours, hierarchy = cDv2.findContours(img,cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    # for contour in range(0,len(contours)):
-    # 	(x, y, w, h) = cv2.boundingRect(contours[contour])
-    # 	image = cv2.rectangle(img,(x,y),(x+w,y+h),(150,150,150),2)
-    # 	letter_image_regions.append((x, y, w, h))
-    # 	cv2.imshow('image'+str(contour),image)
-    # 	cv2.waitKey(0)
-    # 	cv2.destroyAllWindows()
 
     # for i in range(0, 5):
     #     if len(name) > 0:
@@ -152,5 +128,4 @@ dataset = (x_train, y_train), (x_test, y_test)
 # cv2.destroyAllWindows()
 
 np.array(dataset).dump(open('captcha.npy', 'wb'))
-exit
 # np.save('captcha', np.array(dataset))
