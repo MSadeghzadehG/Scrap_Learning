@@ -75,6 +75,8 @@ def courses_output(cookies):
     menu_urls.append(main_url + menu_request+'u_phyedu1')
     menu_urls.append(main_url + menu_request+'u_phyedu2')
     all_courses = []
+    if not os.path.exists('menus'):
+        os.makedirs('menus')
     for tab in menu_urls:
         request = connection_control(url = tab,cookies=cookies)
         all_courses.extend(find_elements_by_xpath(request.content.decode('utf-8'), '/html/body/form/table/tr[4]/td/table/tr'))
