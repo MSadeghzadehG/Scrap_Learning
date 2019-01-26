@@ -31,13 +31,14 @@ def connection_control(method = 'get',url='',cookies='',stream = False):
         elif method == 'post':
             r = requests.post(url, headers={'Cookie': cookies} ,timeout=timeout)
     except:
+        r = ""
         print('connection timed out')
         connection_control(method,url,cookies,stream)
     return r
 
 
 def plans_output(all_courses, plans):
-    with open('mycourses.html', 'w') as f:
+    with open('mycourses.html', 'w', encoding="utf-8") as f:
         for plan in plans:
             f.write('<table>')
             for course in all_courses:
@@ -80,7 +81,7 @@ def courses_output(cookies):
     for tab in menu_urls:
         request = connection_control(url = tab,cookies=cookies)
         all_courses.extend(find_elements_by_xpath(request.content.decode('utf-8'), '/html/body/form/table/tr[4]/td/table/tr'))
-        f = open('menus/menu'+str(menu_urls.index(tab))+'.html', 'w')
+        f = open('menus/menu'+str(menu_urls.index(tab))+'.html', 'w', encoding="utf-8")
         f.write(request.text)
         f.close()
     return all_courses
@@ -236,7 +237,7 @@ def login(model):
     request = connection_control(method='post',url = login_page + 'login.jsp?' + data,cookies= cookies)
     # print(request.headers)
     request = connection_control(method='post',url=right_menu,cookies=cookies)
-    f = open('result1.html', 'w')
+    f = open('result1.html', 'w', encoding="utf-8")
     f.write(request.text)
     f.close()
     if 'Set-Cookie' in request.headers.keys():
@@ -339,7 +340,7 @@ def main():
 
     # 'https://portal.aut.ac.ir/aportal/regadm/student.portal/student.portal.jsp?action=apply_reg&st_info=add&st_reg_course=3159573_1__&addpassline=ub&st_course_add=%D8%AF%D8%B1%D8%B3+%D8%B1%D8%A7+%D8%A7%D8%B6%D8%A7%D9%81%D9%87+%DA%A9%D9%86'
     # 'https://portal.aut.ac.ir/aportal/regadm/student.portal/student.portal.jsp?action=apply_reg&st_info=add&st_reg_course=3159573_1__&addpassline=vv&st_course_add=%D8%AF%D8%B1%D8%B3+%D8%B1%D8%A7+%D8%A7%D8%B6%D8%A7%D9%81%D9%87+%DA%A9%D9%86'
-    exit()
+    os._exit(1)
 
 
 if __name__ == "__main__":
