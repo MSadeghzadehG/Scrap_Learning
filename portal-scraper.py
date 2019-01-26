@@ -31,9 +31,8 @@ def connection_control(method = 'get',url='',cookies='',stream = False):
         elif method == 'post':
             r = requests.post(url, headers={'Cookie': cookies} ,timeout=timeout)
     except:
-        r = ""
         print('connection timed out')
-        connection_control(method,url,cookies,stream)
+        r = connection_control(method,url,cookies,stream)
     return r
 
 
