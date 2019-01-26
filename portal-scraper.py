@@ -20,24 +20,20 @@ main_menu_url = main_url + menu_request+'u_mine_all'
 username = str('')
 password = str('')
 drop_wait = 1
+timeout = 3
 
 
-menu_urls = []
-menu_urls.append(main_url + menu_request+'u_pre_register')
-menu_urls.append(main_url + menu_request+'u_math')
-menu_urls.append(main_url + menu_request+'u_physlab2')
-menu_urls.append(main_url + menu_request+'u_phys')
-menu_urls.append(main_url + menu_request+'u_physlab1')
-menu_urls.append(main_url + menu_request+'u_serv')
-menu_urls.append(main_url + menu_request+'u_english')
-menu_urls.append(main_url + menu_request+'u_history')
-menu_urls.append(main_url + menu_request+'u_andishe')
-menu_urls.append(main_url + menu_request+'u_persian')
-menu_urls.append(main_url + menu_request+'u_akhlagh')
-menu_urls.append(main_url + menu_request+'u_revel')
-menu_urls.append(main_url + menu_request+'u_tafsir')
-menu_urls.append(main_url + menu_request+'u_phyedu1')
-menu_urls.append(main_url + menu_request+'u_phyedu2')
+# manages the connection timeout
+def connection_control(method = 'get',url='',cookies='',stream = False):
+    try:
+        if method == 'get':
+            r = requests.get(url, headers={'Cookie': cookies} ,timeout=timeout)
+        elif method == 'post':
+            r = requests.post(url, headers={'Cookie': cookies} ,timeout=timeout)
+    except:
+        print('connection timed out')
+        connection_control(method,url,cookies,stream)
+    return r
 
 
 def plans_output(all_courses, plans):
@@ -61,10 +57,26 @@ def find_elements_by_xpath(text, xpath):
     return list
 
 
-def courses_output(cookies, menu_urls):
+def courses_output(cookies):
+    menu_urls = []
+    menu_urls.append(main_url + menu_request+'u_pre_register')
+    menu_urls.append(main_url + menu_request+'u_math')
+    menu_urls.append(main_url + menu_request+'u_physlab2')
+    menu_urls.append(main_url + menu_request+'u_phys')
+    menu_urls.append(main_url + menu_request+'u_physlab1')
+    menu_urls.append(main_url + menu_request+'u_serv')
+    menu_urls.append(main_url + menu_request+'u_english')
+    menu_urls.append(main_url + menu_request+'u_history')
+    menu_urls.append(main_url + menu_request+'u_andishe')
+    menu_urls.append(main_url + menu_request+'u_persian')
+    menu_urls.append(main_url + menu_request+'u_akhlagh')
+    menu_urls.append(main_url + menu_request+'u_revel')
+    menu_urls.append(main_url + menu_request+'u_tafsir')
+    menu_urls.append(main_url + menu_request+'u_phyedu1')
+    menu_urls.append(main_url + menu_request+'u_phyedu2')
     all_courses = []
     for tab in menu_urls:
-        request = requests.get(tab, headers={'Cookie': cookies})
+        request = connection_control(url = tab,cookies=cookies)
         all_courses.extend(find_elements_by_xpath(request.content.decode('utf-8'), '/html/body/form/table/tr[4]/td/table/tr'))
         f = open('menus/menu'+str(menu_urls.index(tab))+'.html', 'w')
         f.write(request.text)
@@ -73,8 +85,11 @@ def courses_output(cookies, menu_urls):
 
 
 # bainrizes the login page captcha image 
-def filter_captcha(img):
-    img = img[5:35, 5:145]
+def filter_captcha(img,num_of_letters):
+    if num_of_letters == 5:
+        img = img[5:35, 5:145]
+    else :
+        img = img[5:35,2:58]
     n_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     color = ('b', 'g', 'r')
     selected_color_max, max_hist = 'n', cv2.calcHist([n_img], [0], None, [256], [0, 256]).max()
@@ -154,7 +169,8 @@ def get_course_filter_captcha(img):
 
 # gets the captcha image
 def get_captcha(cookies):
-    request = requests.get(login_captcha_url, headers={'Cookie': cookies}, stream=True)
+    request = connection_control(url = login_captcha_url, cookies= cookies, stream=True)
+    # print('get captcha'+request.headers)
     nparr = bytearray(b'')
     for chunk in request.iter_content(chunk_size=128):
         nparr.extend(chunk)
@@ -175,7 +191,7 @@ def bypass_captcha(model, cookies,num_of_letters,num_of_check):
         # cv2.imshow('img', img)
         # cv2.waitKey(0)
         # cv2.destroyAllWindows()
-        img = get_course_filter_captcha(img)
+        img = filter_captcha(img,num_of_letters)
         # cv2.imshow('img', img)
         # cv2.waitKey(0)
         # cv2.destroyAllWindows()
@@ -205,20 +221,19 @@ def bypass_captcha(model, cookies,num_of_letters,num_of_check):
 
 # login to portal
 def login(model):
-    request = requests.get(login_page)
+    request = connection_control(url=login_page)
     # print(request.headers)
-    cookies = 'JSESSIONID=' + str(
-        request.headers['Set-Cookie'].split(';')[0].split('=')[1]) + ';_ga=GA1.3.787589358.1533647200'
+    cookies = 'JSESSIONID=' + str(request.headers['Set-Cookie'].split(';')[0].split('=')[1]) + ';_ga=GA1.3.787589358.1533647200'
     try:
-        captcha = bypass_captcha(model,cookies,5,15)
+        captcha = bypass_captcha(model,cookies,5,5)
     except:
         captcha = 'aaaaa'
     # print('write the captcha:')
     # captcha = input()
     data = 'username=' + username + '&password=' + password + '&passline=' + captcha + '&login=%D9%88%D8%B1%D9%88%D8%AF+%D8%A8%D9%87+%D9%BE%D9%88%D8%B1%D8%AA%D8%A7%D9%84'
-    request = requests.post(login_page + 'login.jsp?' + data, headers={'Cookie': cookies})
+    request = connection_control(method='post',url = login_page + 'login.jsp?' + data,cookies= cookies)
     # print(request.headers)
-    request = requests.post(right_menu, headers={'Cookie': cookies})
+    request = connection_control(method='post',url=right_menu,cookies=cookies)
     f = open('result1.html', 'w')
     f.write(request.text)
     f.close()
@@ -243,11 +258,11 @@ def get_course(input_value, cookies, model):
     # input_value = '1051112_1__'
     get_course = 'https://portal.aut.ac.ir/aportal/regadm/student.portal/student.portal.jsp?action=apply_reg&st_info=add&st_reg_course='+input_value+'&addpassline='+bypass_captcha(model, cookies,2,5)+'&st_course_add=%D8%AF%D8%B1%D8%B3+%D8%B1%D8%A7+%D8%A7%D8%B6%D8%A7%D9%81%D9%87+%DA%A9%D9%86'
     # print(get_course)
-    request = requests.post(get_course, headers={'Cookie': cookies})
+    request = connection_control(method='post',url= get_course,cookies= cookies)
     while '(3)' in request.text:
         print('course captcha failed')
         sleep(drop_wait)
-        request = requests.post(get_course, headers={'Cookie': cookies})
+        request = connection_control(method='post',url= get_course,cookies= cookies)
     # print(request.text)
     f = open('result.html', 'w')
     f.write(request.text)
@@ -259,6 +274,7 @@ def get_course(input_value, cookies, model):
 
 
 def main():
+
     # load json and create model
     json_file = open('model.json', 'r')
     loaded_model_json = json_file.read()
@@ -267,6 +283,7 @@ def main():
     # load weights into new model
     model.load_weights("model.h5")
     print("Loaded model from disk")
+
 
     plan1 = []
     # p1
@@ -300,14 +317,14 @@ def main():
 
     cookies = login_control(model)
     print('login done')
-    requests.get('https://portal.aut.ac.ir/aportal/regadm/student.portal/student.portal.jsp?action=edit&st_info=register&st_sub_info=u_mine_all', headers={'Cookie': cookies})
+    connection_control(url='https://portal.aut.ac.ir/aportal/regadm/student.portal/student.portal.jsp?action=edit&st_info=register&st_sub_info=u_mine_all',cookies=cookies)
     # get_course('2305213_1_2305210_1', cookies, model)
 
     # plans = [plan1, plan2]
-    # all_courses = courses_output(cookies)
+    all_courses = courses_output(cookies)
     # plans_output(all_courses,plans)
 
-    while True:
+    if True:
         sleep(drop_wait)
         request = requests.get(main_menu_url, headers={'Cookie': cookies})
         for course in plan1:
@@ -324,7 +341,7 @@ def main():
 
 
 if __name__ == "__main__":
-    try:
-        main()
-    except:
-        main()
+    # try:
+    main()
+    # except:
+    #     main()
