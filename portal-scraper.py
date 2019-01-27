@@ -7,6 +7,9 @@ from keras.models import model_from_json
 import numpy as np
 from time import sleep
 
+drop_wait = 0
+timeout = 3
+num_of_captchaCheck = 5
 
 main_url = 'https://portal.aut.ac.ir'
 login_page = "https://portal.aut.ac.ir/aportal/"
@@ -19,9 +22,16 @@ main_menu_url = main_url + menu_request+'u_mine_all'
 # set the portal username and password for logging in 
 username = str('')
 password = str('')
-drop_wait = 0
-timeout = 3
-num_of_captchaCheck = 5
+
+if (username == '') or (password == ''):
+    try:
+        f=open("account.txt", "r+")
+        contents =f.readline().split(',')
+        username = contents[0]
+        password = contents[1]
+    except:
+        print("Please set your account informaition")
+        os._exit(1)
 
 
 # manages the connection timeout
@@ -270,11 +280,14 @@ def get_course(input_value, cookies, model):
         sleep(drop_wait)
         get_course = 'https://portal.aut.ac.ir/aportal/regadm/student.portal/student.portal.jsp?action=apply_reg&st_info=add&st_reg_course='+input_value+'&addpassline='+bypass_captcha(model, cookies,2,num_of_captchaCheck)+'&st_course_add=%D8%AF%D8%B1%D8%B3+%D8%B1%D8%A7+%D8%A7%D8%B6%D8%A7%D9%81%D9%87+%DA%A9%D9%86'
         request = connection_control(method='post',url= get_course,cookies= cookies)
-    f = open('result.html', 'w')
+    # print(request.text)
+    f = open('result.html', 'w', encoding="utf-8")
     f.write(request.text)
     f.close()
     if 'اخذ شده' in request.text:
         return True
+    elif 'Login' in request.text:
+        main()
     else:
         return False
 
