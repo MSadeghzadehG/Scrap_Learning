@@ -19,6 +19,16 @@ main_menu_url = main_url + menu_request+'u_mine_all'
 # set the portal username and password for logging in 
 username = str('')
 password = str('')
+if (username == '') or (password == ''):
+    try:
+        f=open("account.txt", "r+")
+        contents =f.readline().split(',')
+        username = contents[0]
+        password = contents[1]
+    except:
+        print("Please set your account informaition")
+        os._exit(1)
+
 drop_wait = 1
 timeout = 3
 
