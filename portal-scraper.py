@@ -9,7 +9,7 @@ from time import sleep
 
 drop_wait = 0
 timeout = 3
-num_of_captchaCheck = 5
+num_of_captchaCheck = 1
 
 main_url = 'https://portal.aut.ac.ir'
 login_page = "https://portal.aut.ac.ir/aportal/"
@@ -50,14 +50,19 @@ def connection_control(method = 'get',url='',cookies='',stream = False):
 def plans_output(all_courses, plans):
     with open('mycourses.html', 'w', encoding="utf-8") as f:
         for plan in plans:
+            p = dict(plan)
             f.write('<table>')
             for course in all_courses:
                 for child in course.iter():
                     if child.tag == 'input':
-                        if child.attrib['value'] in plan:
+                        try:
+                            p[child.attrib['value']]
                             f.write(html.etree.tostring(course).decode('utf-8'))
+                        except:
+                            pass
             f.write('</table>')
             f.write('<hr>')
+        print('plans_output done')
 
 
 def find_elements_by_xpath(text, xpath):
@@ -95,6 +100,7 @@ def courses_output(cookies):
         f = open('menus/menu'+str(menu_urls.index(tab))+'.html', 'w', encoding="utf-8")
         f.write(request.text)
         f.close()
+        print('menus/menu'+str(menu_urls.index(tab))+'.html done')
     return all_courses
 
 
@@ -138,6 +144,7 @@ def filter_captcha(img,num_of_letters):
         img = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
     else:
         img = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
+    print('filter_captcha done')
     return img
 
 
@@ -190,10 +197,7 @@ def get_captcha(cookies):
         nparr.extend(chunk)
     nparr = np.fromstring(bytes(nparr), np.uint8)
     img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-    # img = filter_captcha(img)
-    # cv2.imshow('img', img)
-    # cv2.waitKey(0)
-    # cv2.destroyAllWindows()
+    print('get_captcha done')
     return img
 
 
@@ -231,7 +235,7 @@ def bypass_captcha(model, cookies,num_of_letters,num_of_check):
             letter.append(captchas[i][j])
         letters.append(max(set(letter), key=letter.count))
     captcha = ''.join(letters)
-    print(captcha)
+    print('captcha bypassed : ' + captcha)
     # a = input()
     return captcha
 
@@ -265,14 +269,16 @@ def login_control(model):
     while True:
         returns = login(model)
         if returns[0]:
+            print('login done')
             return returns[2]
         print('login failed')
         sleep(drop_wait)
 
 
 # gets the selected course
-def get_course(input_value, cookies, model):
+def get_course(course, cookies, model):
     # input_value = '1051112_1__'
+    input_value = course[0]
     get_course = 'https://portal.aut.ac.ir/aportal/regadm/student.portal/student.portal.jsp?action=apply_reg&st_info=add&st_reg_course='+input_value+'&addpassline='+bypass_captcha(model, cookies,2,num_of_captchaCheck)+'&st_course_add=%D8%AF%D8%B1%D8%B3+%D8%B1%D8%A7+%D8%A7%D8%B6%D8%A7%D9%81%D9%87+%DA%A9%D9%86'
     request = connection_control(method='post',url= get_course,cookies= cookies)
     while '(3)' in request.text:
@@ -285,10 +291,13 @@ def get_course(input_value, cookies, model):
     f.write(request.text)
     f.close()
     if 'اخذ شده' in request.text:
+        print(course[1] + ' done')
         return True
     elif 'Login' in request.text:
+        # bad way!
         main()
     else:
+        print(course[1] + ' failed')
         return False
 
 
@@ -301,13 +310,13 @@ def main():
     model = model_from_json(loaded_model_json)
     # load weights into new model
     model.load_weights("model.h5")
-    print("Loaded model from disk")
+    print("model loaded from disk")
 
 
     plan1 = []
-    plan1.append(('1091113_1_1091110_1', 'mm')) #mm sedighi
-    plan1.append(('1051203_1__', 'me')) #me
-    plan1.append(('1051312_4__', 'ae')) #ae
+    plan1.append(('3102103_1__', 'jk')) #mm sedighi
+    plan1.append(('2302013_2_2302010_2', 'ea')) #me
+    plan1.append(('3103073_1__', 'n1')) #ae
     # plan1.append(('3102021_6__', 'am')) #am
     # plan1.append(('3102033_2_3102030_2', 'ds'))  # ds
     # plan1.append(('1040111_7__', 't2')) # t2
@@ -329,19 +338,16 @@ def main():
     
 
     cookies = login_control(model)
-    print('login done')
     # connection_control(url='https://portal.aut.ac.ir/aportal/regadm/student.portal/student.portal.jsp?action=edit&st_info=register&st_sub_info=u_mine_all',cookies=cookies)
-    print('safe asli')
     plans = [plan1, plan2]
-
-    # all_courses = courses_output(cookies)
-    # plans_output(all_courses,plans)
+    all_courses = courses_output(cookies)
+    plans_output(all_courses,plans)
 
     while True:
         sleep(drop_wait)
-        request = requests.get(main_menu_url, headers={'Cookie': cookies})
+        # request = connection_control(url=main_menu_url,cookies= cookies)
         for course in plan1:
-            get_course(course[0], cookies, model)
+            get_course(course, cookies, model)
 
     # print(request.content)
     # < input class ="stdcheckbox" type="checkbox" id="st_reg_course" name="st_reg_course" value="{CousreId}_{GroupNo}_{AssistCourseId}_{AssistGroupNo}" >
