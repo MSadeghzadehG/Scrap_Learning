@@ -328,8 +328,7 @@ def main():
         sleep(drop_wait)
         request = requests.get(main_menu_url, headers={'Cookie': cookies})
         for course in plan1:
-            if course[0] in request.text:
-                get_course(course[0], cookies, model)
+            get_course(course[0], cookies, model)
 
     # print(request.content)
     # < input class ="stdcheckbox" type="checkbox" id="st_reg_course" name="st_reg_course" value="{CousreId}_{GroupNo}_{AssistCourseId}_{AssistGroupNo}" >
