@@ -260,7 +260,6 @@ def login_control(model):
 def get_course(input_value, cookies, model):
     # input_value = '1051112_1__'
     get_course = 'https://portal.aut.ac.ir/aportal/regadm/student.portal/student.portal.jsp?action=apply_reg&st_info=add&st_reg_course='+input_value+'&addpassline='+bypass_captcha(model, cookies,2,5)+'&st_course_add=%D8%AF%D8%B1%D8%B3+%D8%B1%D8%A7+%D8%A7%D8%B6%D8%A7%D9%81%D9%87+%DA%A9%D9%86'
-    # print(get_course)
     request = connection_control(method='post',url= get_course,cookies= cookies)
     while '(3)' in request.text:
         print('course captcha failed')
@@ -289,7 +288,6 @@ def main():
 
 
     plan1 = []
-    # p1
     plan1.append(('3102013_2__', 'mm')) #mm sedighi
     # plan1.append(('3102043_2__', 'me')) #me
     # plan1.append(('3102051_3__', 'ae')) #ae
@@ -321,13 +319,12 @@ def main():
     cookies = login_control(model)
     print('login done')
     connection_control(url='https://portal.aut.ac.ir/aportal/regadm/student.portal/student.portal.jsp?action=edit&st_info=register&st_sub_info=u_mine_all',cookies=cookies)
-    # get_course('2305213_1_2305210_1', cookies, model)
 
-    # plans = [plan1, plan2]
+    plans = [plan1, plan2]
     all_courses = courses_output(cookies)
-    # plans_output(all_courses,plans)
+    plans_output(all_courses,plans)
 
-    if True:
+    while True:
         sleep(drop_wait)
         request = requests.get(main_menu_url, headers={'Cookie': cookies})
         for course in plan1:
@@ -337,9 +334,8 @@ def main():
     # print(request.content)
     # < input class ="stdcheckbox" type="checkbox" id="st_reg_course" name="st_reg_course" value="{CousreId}_{GroupNo}_{AssistCourseId}_{AssistGroupNo}" >
     # < input class ="stdcheckbox" type="checkbox" id="st_reg_course" name="st_reg_course" value="1011103_1_1011100_1" >
-
     # 'https://portal.aut.ac.ir/aportal/regadm/student.portal/student.portal.jsp?action=apply_reg&st_info=add&st_reg_course=3159573_1__&addpassline=ub&st_course_add=%D8%AF%D8%B1%D8%B3+%D8%B1%D8%A7+%D8%A7%D8%B6%D8%A7%D9%81%D9%87+%DA%A9%D9%86'
-    # 'https://portal.aut.ac.ir/aportal/regadm/student.portal/student.portal.jsp?action=apply_reg&st_info=add&st_reg_course=3159573_1__&addpassline=vv&st_course_add=%D8%AF%D8%B1%D8%B3+%D8%B1%D8%A7+%D8%A7%D8%B6%D8%A7%D9%81%D9%87+%DA%A9%D9%86'
+
     os._exit(1)
 
 
