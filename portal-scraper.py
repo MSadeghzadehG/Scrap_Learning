@@ -7,6 +7,9 @@ from keras.models import model_from_json
 import numpy as np
 from time import sleep
 
+drop_wait = 0
+timeout = 3
+num_of_captchaCheck = 5
 
 main_url = 'https://portal.aut.ac.ir'
 login_page = "https://portal.aut.ac.ir/aportal/"
@@ -19,6 +22,7 @@ main_menu_url = main_url + menu_request+'u_mine_all'
 # set the portal username and password for logging in 
 username = str('')
 password = str('')
+
 if (username == '') or (password == ''):
     try:
         f=open("account.txt", "r+")
@@ -28,9 +32,6 @@ if (username == '') or (password == ''):
     except:
         print("Please set your account informaition")
         os._exit(1)
-
-drop_wait = 1
-timeout = 3
 
 
 # manages the connection timeout
@@ -190,13 +191,16 @@ def get_captcha(cookies):
     nparr = np.fromstring(bytes(nparr), np.uint8)
     img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
     # img = filter_captcha(img)
+    # cv2.imshow('img', img)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
     return img
 
 
 # bypasses captcha image
 def bypass_captcha(model, cookies,num_of_letters,num_of_check):
     captchas = []
-    # print ('omad')
+    # print ('omad')    
     for i in range(0, num_of_check):
         # sleep(1)
         captcha = ''
@@ -238,7 +242,7 @@ def login(model):
     # print(request.headers)
     cookies = 'JSESSIONID=' + str(request.headers['Set-Cookie'].split(';')[0].split('=')[1]) + ';_ga=GA1.3.787589358.1533647200'
     try:
-        captcha = bypass_captcha(model,cookies,5,5)
+        captcha = bypass_captcha(model,cookies,5,num_of_captchaCheck)
     except:
         captcha = 'aaaaa'
     # print('write the captcha:')
@@ -269,11 +273,12 @@ def login_control(model):
 # gets the selected course
 def get_course(input_value, cookies, model):
     # input_value = '1051112_1__'
-    get_course = 'https://portal.aut.ac.ir/aportal/regadm/student.portal/student.portal.jsp?action=apply_reg&st_info=add&st_reg_course='+input_value+'&addpassline='+bypass_captcha(model, cookies,2,5)+'&st_course_add=%D8%AF%D8%B1%D8%B3+%D8%B1%D8%A7+%D8%A7%D8%B6%D8%A7%D9%81%D9%87+%DA%A9%D9%86'
+    get_course = 'https://portal.aut.ac.ir/aportal/regadm/student.portal/student.portal.jsp?action=apply_reg&st_info=add&st_reg_course='+input_value+'&addpassline='+bypass_captcha(model, cookies,2,num_of_captchaCheck)+'&st_course_add=%D8%AF%D8%B1%D8%B3+%D8%B1%D8%A7+%D8%A7%D8%B6%D8%A7%D9%81%D9%87+%DA%A9%D9%86'
     request = connection_control(method='post',url= get_course,cookies= cookies)
     while '(3)' in request.text:
         print('course captcha failed')
         sleep(drop_wait)
+        get_course = 'https://portal.aut.ac.ir/aportal/regadm/student.portal/student.portal.jsp?action=apply_reg&st_info=add&st_reg_course='+input_value+'&addpassline='+bypass_captcha(model, cookies,2,num_of_captchaCheck)+'&st_course_add=%D8%AF%D8%B1%D8%B3+%D8%B1%D8%A7+%D8%A7%D8%B6%D8%A7%D9%81%D9%87+%DA%A9%D9%86'
         request = connection_control(method='post',url= get_course,cookies= cookies)
     # print(request.text)
     f = open('result.html', 'w', encoding="utf-8")
@@ -281,6 +286,8 @@ def get_course(input_value, cookies, model):
     f.close()
     if 'اخذ شده' in request.text:
         return True
+    elif 'Login' in request.text:
+        main()
     else:
         return False
 
@@ -298,9 +305,9 @@ def main():
 
 
     plan1 = []
-    plan1.append(('3102013_2__', 'mm')) #mm sedighi
-    # plan1.append(('3102043_2__', 'me')) #me
-    # plan1.append(('3102051_3__', 'ae')) #ae
+    plan1.append(('1091113_1_1091110_1', 'mm')) #mm sedighi
+    plan1.append(('1051203_1__', 'me')) #me
+    plan1.append(('1051312_4__', 'ae')) #ae
     # plan1.append(('3102021_6__', 'am')) #am
     # plan1.append(('3102033_2_3102030_2', 'ds'))  # ds
     # plan1.append(('1040111_7__', 't2')) # t2
@@ -321,25 +328,20 @@ def main():
     # plan2.append('1051112_1__') #nk
     
 
-    # request = requests.get(login_page)
-    # # print(request.headers)
-    # cookies = 'JSESSIONID=' + str(
-    #     request.headers['Set-Cookie'].split(';')[0].split('=')[1]) + ';_ga=GA1.3.787589358.1533647200'
-
     cookies = login_control(model)
     print('login done')
-    connection_control(url='https://portal.aut.ac.ir/aportal/regadm/student.portal/student.portal.jsp?action=edit&st_info=register&st_sub_info=u_mine_all',cookies=cookies)
-
+    # connection_control(url='https://portal.aut.ac.ir/aportal/regadm/student.portal/student.portal.jsp?action=edit&st_info=register&st_sub_info=u_mine_all',cookies=cookies)
+    print('safe asli')
     plans = [plan1, plan2]
-    all_courses = courses_output(cookies)
-    plans_output(all_courses,plans)
+
+    # all_courses = courses_output(cookies)
+    # plans_output(all_courses,plans)
 
     if True:
         sleep(drop_wait)
         request = requests.get(main_menu_url, headers={'Cookie': cookies})
         for course in plan1:
-            if course[0] in request.text:
-                get_course(course[0], cookies, model)
+            get_course(course[0], cookies, model)
 
     # print(request.content)
     # < input class ="stdcheckbox" type="checkbox" id="st_reg_course" name="st_reg_course" value="{CousreId}_{GroupNo}_{AssistCourseId}_{AssistGroupNo}" >
