@@ -60,6 +60,7 @@ def find_elements_by_xpath(text, xpath):
 def courses_output(cookies):
     menu_urls = []
     menu_urls.append(main_url + menu_request+'u_pre_register')
+    menu_urls.append(main_url + menu_request+'u_mine_all')
     menu_urls.append(main_url + menu_request+'u_math')
     menu_urls.append(main_url + menu_request+'u_physlab2')
     menu_urls.append(main_url + menu_request+'u_phys')
