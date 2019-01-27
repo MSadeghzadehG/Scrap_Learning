@@ -276,7 +276,7 @@ def get_course(input_value, cookies, model):
         sleep(drop_wait)
         request = connection_control(method='post',url= get_course,cookies= cookies)
     # print(request.text)
-    f = open('result.html', 'w')
+    f = open('result.html', 'w', encoding="utf-8")
     f.write(request.text)
     f.close()
     if 'اخذ شده' in request.text:
