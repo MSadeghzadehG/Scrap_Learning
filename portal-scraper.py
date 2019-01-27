@@ -1,8 +1,5 @@
-import requests
-import os
-import cv2
+import os,cv2,requests
 from lxml import html
-import json
 from keras.models import model_from_json
 import numpy as np
 from time import sleep
@@ -204,7 +201,6 @@ def get_captcha(cookies):
 # bypasses captcha image
 def bypass_captcha(model, cookies,num_of_letters,num_of_check):
     captchas = []
-    # print ('omad')    
     for i in range(0, num_of_check):
         # sleep(1)
         captcha = ''
@@ -302,7 +298,6 @@ def get_course(course, cookies, model):
 
 
 def main():
-
     # load json and create model
     json_file = open('model.json', 'r')
     loaded_model_json = json_file.read()
@@ -314,9 +309,9 @@ def main():
 
 
     plan1 = []
-    plan1.append(('3102103_1__', 'jk')) #mm sedighi
-    plan1.append(('2302013_2_2302010_2', 'ea')) #me
-    plan1.append(('3103073_1__', 'n1')) #ae
+    plan1.append(('3102103_1__', 'jk')) 
+    plan1.append(('2302013_2_2302010_2', 'ea')) 
+    plan1.append(('3103073_1__', 'n1'))
     # plan1.append(('3102021_6__', 'am')) #am
     # plan1.append(('3102033_2_3102030_2', 'ds'))  # ds
     # plan1.append(('1040111_7__', 't2')) # t2
