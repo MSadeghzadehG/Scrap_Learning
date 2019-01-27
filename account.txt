@@ -1,4 +1,0 @@
-username,password
-
-#example
-#9625000,123456
