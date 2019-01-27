@@ -334,7 +334,7 @@ def main():
     all_courses = courses_output(cookies)
     plans_output(all_courses,plans)
 
-    while True:
+    if True:
         sleep(drop_wait)
         request = requests.get(main_menu_url, headers={'Cookie': cookies})
         for course in plan1:
