@@ -4,7 +4,7 @@ from keras.models import model_from_json
 import numpy as np
 from time import sleep
 
-drop_wait = 0
+drop_wait = 2
 timeout = 3
 num_of_captchaCheck = 1
 
@@ -309,14 +309,18 @@ def main():
 
 
     plan1 = []
-    plan1.append(('3102103_1__', 'jk')) 
-    plan1.append(('2302013_2_2302010_2', 'ea')) 
-    plan1.append(('3103073_1__', 'n1'))
-    # plan1.append(('3102021_6__', 'am')) #am
-    # plan1.append(('3102033_2_3102030_2', 'ds'))  # ds
-    # plan1.append(('1040111_7__', 't2')) # t2
-    # plan1.append(('1061032_4__', 'z2')) #z2
-    # plan1.append(('1011103_3_1011100_6', 'r2')) #r2
+    plan1.append(('3102213_1__', 'algorithm')) 
+    plan1.append(('1011303_2__', 'amar'))  #mirzakhah
+    plan1.append(('1061032_11__', 'zaban2'))
+    plan1.append(('3102073_3__', 'memari')) #1-3
+    plan1.append(('3102081_1__', 'az memari'))
+    plan1.append(('3102103_1__', 'jabr')) 
+    plan1.append(('3102093_1__', 'nazarie')) #meibody
+    # plan1.append(('3102093_2__', 'nazarie')) #saghiri
+
+    # plan1.append(('2302013_2_2302010_2', 'amar')) #pourahmadi
+    # plan1.append(('3102073_2__', 'memari')) #10-12
+
 
     plan2 = []
     # p2
