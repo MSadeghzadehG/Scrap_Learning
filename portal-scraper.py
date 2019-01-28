@@ -309,16 +309,14 @@ def main():
     model = model_from_json(loaded_model_json)
     # load weights into new model
     model.load_weights("model.h5")
-    print("model loaded from disk")
+    print("model loaded")
 
 
     plan1 = []
-    #plan1.append(('3102213_1__', 'algorithm')) 
-    #plan1.append(('1011303_2__', 'amar'))  #mirzakhah
 
     if plan1 == [] :
             try:
-                with open('plan1.txt', 'r') as filehandle:  
+                with open('plan.txt', 'r') as filehandle:  
                     for x in filehandle:
                         if not x.strip():
                             continue
@@ -331,31 +329,23 @@ def main():
                 print("Please set your plan informaition correctly")
                 os._exit(1)
                 
-    plan2 = []
-    # p2
-    # plan2.append('3102013_1__') #mm
-    # plan2.append('3102043_2__') #me
-    # plan2.append('3102051_3__') #ae
-    # plan2.append('3102021_6__') #am
-    # plan2.append('3102033_2_3102030_2') #ds
-    # plan2.append('1022391_1__') #afg
-    # plan2.append('1011103_4_1011100_6') #r2
-    # plan2.append('1040111_7__') #t2
-    # plan2.append('1051412_11__') #em1
-    # plan2.append('1051112_1__') #nk
-    
 
     cookies = login_control(model)
     # connection_control(url='https://portal.aut.ac.ir/aportal/regadm/student.portal/student.portal.jsp?action=edit&st_info=register&st_sub_info=u_mine_all',cookies=cookies)
-    plans = [plan1, plan2]
+    plans = [plan1]
     # all_courses = courses_output(cookies)
     # plans_output(all_courses,plans)
+    registered_courses = []
 
     while True:
         sleep(drop_wait)
         # request = connection_control(url=main_menu_url,cookies= cookies)
         for course in plan1:
-            get_course(course, cookies, model)
+            if not course[1] in registered_courses:
+                if get_course(course, cookies, model):
+                    registered_courses.append(course[1])
+            print('registered courses: ' + str(registered_courses))
+
 
     # print(request.content)
     # < input class ="stdcheckbox" type="checkbox" id="st_reg_course" name="st_reg_course" value="{CousreId}_{GroupNo}_{AssistCourseId}_{AssistGroupNo}" >
