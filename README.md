@@ -1,8 +1,8 @@
 # uni_portal_scraper
 python scraper on portal of Amirkabir University of Technology to automating course selection procedure.
 ### How to use?
-1. Download requirments using requirments.txt => `pip install -r requirements.txt`
-1. Enter your username and password in `portal_scraper.py` or create `account.txt` in the main directory and put your username and password in the first line in this order : `username,password` 
+1. Download requirements using requirements.txt => `pip install -r requirements.txt`
+1. Enter your username and password in `portal_scraper.py` **or** create `account.txt` in the main directory and put your username and password in the first line in this order : `username,password` 
 1. set a plan like `plan1` inside `portal_scraper.py`
 1. find your course code with inspecting portal website **or** use following pattern to set code: `CodeOfCourse_CodeOfGroup__` like `3102013_1__`
 1. run the `portal_scraper.py` and enjoy! :)
