@@ -27,6 +27,7 @@ if (username == '') or (password == ''):
         contents =f.readline().split(',')
         username = contents[0]
         password = contents[1]
+        f.close()
     except:
         print("Please set your account informaition")
         os._exit(1)
@@ -312,19 +313,24 @@ def main():
 
 
     plan1 = []
-    plan1.append(('3102213_1__', 'algorithm')) 
-    plan1.append(('1011303_2__', 'amar'))  #mirzakhah
-    plan1.append(('1061032_11__', 'zaban2'))
-    plan1.append(('3102073_3__', 'memari')) #1-3
-    plan1.append(('3102081_1__', 'az memari'))
-    plan1.append(('3102103_1__', 'jabr')) 
-    plan1.append(('3102093_1__', 'nazarie')) #meibody
-    # plan1.append(('3102093_2__', 'nazarie')) #saghiri
+    #plan1.append(('3102213_1__', 'algorithm')) 
+    #plan1.append(('1011303_2__', 'amar'))  #mirzakhah
 
-    # plan1.append(('2302013_2_2302010_2', 'amar')) #pourahmadi
-    # plan1.append(('3102073_2__', 'memari')) #10-12
-
-
+    if plan1 == [] :
+            try:
+                with open('plan1.txt', 'r') as filehandle:  
+                    for x in filehandle:
+                        if not x.strip():
+                            continue
+                        x = x.replace('\n', '')
+                        #print(x)
+                        contents = x.split(',')
+                        plan1.append((contents[0], contents[1]))
+                        #print(plan1)
+            except:
+                print("Please set your plan informaition correctly")
+                os._exit(1)
+                
     plan2 = []
     # p2
     # plan2.append('3102013_1__') #mm
