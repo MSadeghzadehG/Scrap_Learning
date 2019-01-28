@@ -8,6 +8,7 @@ drop_wait = 0
 timeout = 3
 num_of_captchaCheck = 1
 
+
 main_url = 'https://portal.aut.ac.ir'
 login_page = "https://portal.aut.ac.ir/aportal/"
 login_captcha_url = 'https://portal.aut.ac.ir/aportal/PassImageServlet'
@@ -275,13 +276,13 @@ def login_control(model):
 def get_course(course, cookies, model):
     # input_value = '1051112_1__'
     input_value = course[0]
-    get_course = 'https://portal.aut.ac.ir/aportal/regadm/student.portal/student.portal.jsp?action=apply_reg&st_info=add&st_reg_course='+input_value+'&addpassline='+bypass_captcha(model, cookies,2,num_of_captchaCheck)+'&st_course_add=%D8%AF%D8%B1%D8%B3+%D8%B1%D8%A7+%D8%A7%D8%B6%D8%A7%D9%81%D9%87+%DA%A9%D9%86'
-    request = connection_control(method='post',url= get_course,cookies= cookies)
+    get_c = 'https://portal.aut.ac.ir/aportal/regadm/student.portal/student.portal.jsp?action=apply_reg&st_info=add&st_reg_course='+input_value+'&addpassline='+bypass_captcha(model, cookies,2,num_of_captchaCheck)+'&st_course_add=%D8%AF%D8%B1%D8%B3+%D8%B1%D8%A7+%D8%A7%D8%B6%D8%A7%D9%81%D9%87+%DA%A9%D9%86'
+    request = connection_control(method='post',url= get_c,cookies= cookies)
     while '(3)' in request.text:
         print('course captcha failed')
         sleep(drop_wait)
-        get_course = 'https://portal.aut.ac.ir/aportal/regadm/student.portal/student.portal.jsp?action=apply_reg&st_info=add&st_reg_course='+input_value+'&addpassline='+bypass_captcha(model, cookies,2,num_of_captchaCheck)+'&st_course_add=%D8%AF%D8%B1%D8%B3+%D8%B1%D8%A7+%D8%A7%D8%B6%D8%A7%D9%81%D9%87+%DA%A9%D9%86'
-        request = connection_control(method='post',url= get_course,cookies= cookies)
+        get_c = 'https://portal.aut.ac.ir/aportal/regadm/student.portal/student.portal.jsp?action=apply_reg&st_info=add&st_reg_course='+input_value+'&addpassline='+bypass_captcha(model, cookies,2,num_of_captchaCheck)+'&st_course_add=%D8%AF%D8%B1%D8%B3+%D8%B1%D8%A7+%D8%A7%D8%B6%D8%A7%D9%81%D9%87+%DA%A9%D9%86'
+        request = connection_control(method='post',url= get_c,cookies= cookies)
     # print(request.text)
     f = open('result.html', 'w', encoding="utf-8")
     f.write(request.text)
@@ -290,8 +291,10 @@ def get_course(course, cookies, model):
         print(course[1] + ' done')
         return True
     elif 'Login' in request.text:
-        # bad way!
-        main()
+        print()
+        print('logged out')
+        cookies = login_control(model)
+        return get_course(course, cookies, model) 
     else:
         print(course[1] + ' failed')
         return False
@@ -309,14 +312,18 @@ def main():
 
 
     plan1 = []
-    plan1.append(('3102103_1__', 'jk')) 
-    plan1.append(('2302013_2_2302010_2', 'ea')) 
-    plan1.append(('3103073_1__', 'n1'))
-    # plan1.append(('3102021_6__', 'am')) #am
-    # plan1.append(('3102033_2_3102030_2', 'ds'))  # ds
-    # plan1.append(('1040111_7__', 't2')) # t2
-    # plan1.append(('1061032_4__', 'z2')) #z2
-    # plan1.append(('1011103_3_1011100_6', 'r2')) #r2
+    plan1.append(('3102213_1__', 'algorithm')) 
+    plan1.append(('1011303_2__', 'amar'))  #mirzakhah
+    plan1.append(('1061032_11__', 'zaban2'))
+    plan1.append(('3102073_3__', 'memari')) #1-3
+    plan1.append(('3102081_1__', 'az memari'))
+    plan1.append(('3102103_1__', 'jabr')) 
+    plan1.append(('3102093_1__', 'nazarie')) #meibody
+    # plan1.append(('3102093_2__', 'nazarie')) #saghiri
+
+    # plan1.append(('2302013_2_2302010_2', 'amar')) #pourahmadi
+    # plan1.append(('3102073_2__', 'memari')) #10-12
+
 
     plan2 = []
     # p2
@@ -335,8 +342,8 @@ def main():
     cookies = login_control(model)
     # connection_control(url='https://portal.aut.ac.ir/aportal/regadm/student.portal/student.portal.jsp?action=edit&st_info=register&st_sub_info=u_mine_all',cookies=cookies)
     plans = [plan1, plan2]
-    all_courses = courses_output(cookies)
-    plans_output(all_courses,plans)
+    # all_courses = courses_output(cookies)
+    # plans_output(all_courses,plans)
 
     while True:
         sleep(drop_wait)
