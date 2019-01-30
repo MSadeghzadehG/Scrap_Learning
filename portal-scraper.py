@@ -15,6 +15,7 @@ login_captcha_url = 'https://portal.aut.ac.ir/aportal/PassImageServlet'
 right_menu = 'https://portal.aut.ac.ir/aportal/regadm/style/menu/menu.student.jsp'
 menu_request = '/aportal/regadm/student.portal/student.portal.jsp?action=edit&st_info=register&st_sub_info='
 main_menu_url = main_url + menu_request+'u_mine_all'
+load_menu = main_url + menu_request+'u_pre_register'
 
 
 # set the portal username and password for logging in 
@@ -277,6 +278,7 @@ def login_control(model):
 def get_course(course, cookies, model):
     # input_value = '1051112_1__'
     input_value = course[0]
+    request = connection_control(url=load_menu,cookies= cookies)
     get_c = 'https://portal.aut.ac.ir/aportal/regadm/student.portal/student.portal.jsp?action=apply_reg&st_info=add&st_reg_course='+input_value+'&addpassline='+bypass_captcha(model, cookies,2,num_of_captchaCheck)+'&st_course_add=%D8%AF%D8%B1%D8%B3+%D8%B1%D8%A7+%D8%A7%D8%B6%D8%A7%D9%81%D9%87+%DA%A9%D9%86'
     request = connection_control(method='post',url= get_c,cookies= cookies)
     while '(3)' in request.text:
@@ -339,7 +341,6 @@ def main():
 
     while True:
         sleep(drop_wait)
-        # request = connection_control(url=main_menu_url,cookies= cookies)
         for course in plan1:
             if not course[1] in registered_courses:
                 if get_course(course, cookies, model):
