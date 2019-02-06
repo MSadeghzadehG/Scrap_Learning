@@ -4,7 +4,7 @@ from keras.models import model_from_json
 import numpy as np
 from time import sleep
 
-drop_wait = 0
+drop_wait = 0.5
 timeout = 3
 num_of_captchaCheck = 1
 
@@ -198,6 +198,8 @@ def get_captcha(cookies):
     nparr = np.fromstring(bytes(nparr), np.uint8)
     img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
     print('get_captcha done')
+    # !!!!!!!!!!!!make sure the image is completed!!!!!!!!!!!
+    # while img.shap
     return img
 
 
@@ -212,9 +214,6 @@ def bypass_captcha(model, cookies,num_of_letters,num_of_check):
         # cv2.waitKey(0)
         # cv2.destroyAllWindows()
         img = filter_captcha(img,num_of_letters)
-        # cv2.imshow('img', img)
-        # cv2.waitKey(0)
-        # cv2.destroyAllWindows()
         letters = []
         for j in range(0, num_of_letters):
             img1 = np.zeros((30, 27, 1))
@@ -222,10 +221,7 @@ def bypass_captcha(model, cookies,num_of_letters,num_of_check):
             letters.append(img1)
         prediction = list(model.predict(np.array(letters)))
         for predict in prediction:
-            # if float(1) in list(predict):
             captcha += (chr(list(predict).index(max(list(predict))) + 97))
-            # else:
-            #     print(predict)
         captchas.append(captcha)
     letters = []
     for j in range(0, num_of_letters):
@@ -235,7 +231,6 @@ def bypass_captcha(model, cookies,num_of_letters,num_of_check):
         letters.append(max(set(letter), key=letter.count))
     captcha = ''.join(letters)
     print('captcha bypassed : ' + captcha)
-    # a = input()
     return captcha
 
 
@@ -281,7 +276,10 @@ def get_course(course, cookies, model):
     request = connection_control(url=load_menu,cookies= cookies)
     get_c = 'https://portal.aut.ac.ir/aportal/regadm/student.portal/student.portal.jsp?action=apply_reg&st_info=add&st_reg_course='+input_value+'&addpassline='+bypass_captcha(model, cookies,2,num_of_captchaCheck)+'&st_course_add=%D8%AF%D8%B1%D8%B3+%D8%B1%D8%A7+%D8%A7%D8%B6%D8%A7%D9%81%D9%87+%DA%A9%D9%86'
     request = connection_control(method='post',url= get_c,cookies= cookies)
-    while '(3)' in request.text:
+    # print('enter')
+    # input()
+    while 'تصوير' in request.text:
+        request = connection_control(url=load_menu,cookies= cookies)
         print('course captcha failed')
         sleep(drop_wait)
         get_c = 'https://portal.aut.ac.ir/aportal/regadm/student.portal/student.portal.jsp?action=apply_reg&st_info=add&st_reg_course='+input_value+'&addpassline='+bypass_captcha(model, cookies,2,num_of_captchaCheck)+'&st_course_add=%D8%AF%D8%B1%D8%B3+%D8%B1%D8%A7+%D8%A7%D8%B6%D8%A7%D9%81%D9%87+%DA%A9%D9%86'
